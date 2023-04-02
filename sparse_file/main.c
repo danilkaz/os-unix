@@ -21,7 +21,12 @@ int main(int argc, char **argv) {
     while ((b = getopt(argc, argv, "b:")) != -1) {
         switch (b) {
             case 'b':
-                sscanf(optarg, "%d", &block_size);        
+                sscanf(optarg, "%d", &block_size);
+                if (block_size <= 0 || block_size > 65536) {
+                    printf("invalid block_size, must be from 0 to 65536\n");
+                    exit(-1);
+                }
+                break;        
             default:
                 break;
         }
