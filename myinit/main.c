@@ -9,28 +9,26 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/prctl.h>
 
 #define LOG_FILENAME "/tmp/myinit.log"
-#define CONFIG_FILENAME "/tmp/config"
 
 #define MAX_PROCS 16
 #define MAX_ARGS 16        
-#define MAX_LINE_LENGTH 128 
+#define MAX_LINE_LENGTH 1024
 
 FILE* log_file;
+char *config_filename;
 
 struct Subprocess {
-    char *command;
-    char **args;
-    int args_count;
+    int argc;
+    char **argv;
     char *in;
     char *out;
 };
 
 struct Subprocess **subprocs;
 pid_t pids[MAX_PROCS];
-
-int procs_count;
 
 void write_log(char *format, ...) {
     va_list arg_list;
@@ -63,12 +61,11 @@ int exec_command(struct Subprocess *sp) {
         }
         dup2(fd_out, STDOUT_FILENO);
 
-        if (execvp(sp->command, sp->args) == -1) {
+        if (execv(sp->argv[0], sp->argv) == -1) {
             perror("Error while exec command");
             exit(EXIT_FAILURE);
         }
 
-        write_log("Process %d started", getpid());
         return getpid();
     default:
         return pid;
@@ -80,77 +77,91 @@ int is_absolute(char *path) {
 }
 
 int read_config_file() {
-    FILE* file = fopen(CONFIG_FILENAME, "r");
+    FILE* file = fopen(config_filename, "r");
     if (file == NULL) {
         perror("Error while opening config file");
         return -1;
     }
 
-    int count = 0;
+    int index = 0;
     char buf[MAX_LINE_LENGTH];
     while (fgets(buf, sizeof(buf), file) != NULL) {
         buf[strcspn(buf, "\n")] = 0;
 
-        char **args = malloc(sizeof(char*) * MAX_ARGS);
-        char *arg = strtok(buf, " ");
-        int args_count = 0;
-        while (arg != NULL) {
-            args[args_count] = malloc(sizeof(char) * (strlen(arg) + 1));
-            strcpy(args[args_count], arg);
-            args_count++;
-            arg = strtok(NULL, " ");
+        char **line_args = malloc(sizeof(char*) * MAX_ARGS);
+        char *line_arg = strtok(buf, " ");
+        int line_args_count = 0;
+        while (line_arg != NULL) {
+            line_args[line_args_count] = malloc(sizeof(char) * (strlen(line_arg) + 1));
+            strcpy(line_args[line_args_count], line_arg);
+            line_args_count++;
+            line_arg = strtok(NULL, " ");
         }
 
-        if (args_count < 3) {
-            fprintf(stderr, "Too few arguments in line %d\n", count);
+        if (line_args_count < 3) {
+            fprintf(stderr, "Too few arguments in line %d\n", index);
             continue;
         }
 
-        if (!is_absolute(args[0]) || !is_absolute(args[args_count - 2]) || !is_absolute(args[args_count - 1])) {
+        if (!is_absolute(line_args[0]) || !is_absolute(line_args[line_args_count - 2]) || !is_absolute(line_args[line_args_count - 1])) {
             fprintf(stderr, "Path is not absolute");
             continue;
         }
 
-        char **sp_args = malloc(sizeof(char*) * (args_count - 3));
-        int sp_args_count = 0;
+        char **sp_argv = malloc(sizeof(char*) * (line_args_count - 2));
+        int sp_argc = 0;
 
-        for (int i = 1; i < args_count - 2; i++) {
-            sp_args[sp_args_count] = malloc(sizeof(char) * (strlen(args[i]) + 1));
-            strcpy(sp_args[sp_args_count], args[i]);
-            sp_args_count++;
+        for (int i = 0; i < line_args_count - 2; i++) {
+            sp_argv[sp_argc] = malloc(sizeof(char) * (strlen(line_args[i]) + 1));
+            strcpy(sp_argv[sp_argc], line_args[i]);
+            sp_argc++;
         }
 
-        subprocs[count] = (struct Subprocess*)malloc(sizeof(struct Subprocess));
+        subprocs[index] = (struct Subprocess*)malloc(sizeof(struct Subprocess));
 
-        subprocs[count]->command = args[0];
-        subprocs[count]->args = sp_args;
-        subprocs[count]->args_count = sp_args_count;
-        subprocs[count]->in = args[args_count - 2];
-        subprocs[count]->out = args[args_count - 1];
+        subprocs[index]->argc = sp_argc;
+        subprocs[index]->argv = sp_argv;
+        subprocs[index]->in = line_args[line_args_count - 2];
+        subprocs[index]->out = line_args[line_args_count - 1];
 
-        pids[count] = exec_command(subprocs[count]);
-        if (pids[count] < 0) {
+        pids[index] = exec_command(subprocs[index]);
+        if (pids[index] < 0) {
             continue;
         }
 
-        count++;
+        write_log("Process %d started", pids[index]);
+
+        index++;
+    }
+
+    for (int i = index; i < MAX_PROCS; i++) {
+        subprocs[i] = NULL;
     }
 
     fclose(file);
-    return count;
+    return index;
 }
 
 void handle_sighup(int sig) {
     write_log("Received SIGHUP, restarting processes");
 
-    for (int i = 0; i < procs_count; i++) {
-        kill(pids[i], SIGTERM);
+    for (int i = 0; i < MAX_PROCS; i++) {
+        if (pids[i] > 0) {
+            kill(pids[i], SIGTERM);
+        }
     }
 
     run_init();
 }
 
 int main(int argc, char *argv[]) {
+    if (argc < 2) {
+        printf("Usage: %s <config>", argv[0]);
+        exit(EXIT_FAILURE);
+    }
+
+    config_filename = argv[1];
+
     if (chdir("/") != 0) {
         perror("Error while changing directory to root");
         exit(EXIT_FAILURE);
@@ -185,23 +196,29 @@ int main(int argc, char *argv[]) {
 }
 
 void run_init() {
-    procs_count = read_config_file();
-    if (procs_count <= 0) {
+    if (read_config_file() <= 0) {
         perror("Error while reading config file");
         exit(EXIT_FAILURE);
     }
 
     int status;
     while (1) {
-        for (int i = 0; i < procs_count; i++) {
-            if (pids[i] == -1) {
+        pid_t pid = wait(&status);
+
+        for (int i = 0; i < MAX_PROCS; i++) {
+            if (pids[i] <= 0) {
                 continue;
             }
 
-            if (pids[i] == wait(&status) || errno == ECHILD) {
-                write_log("Process %d finished with exit status %d, restarting", pids[i], status);
+            if (pids[i] == pid || errno == ECHILD) {
+                int old_pid = pids[i];
+                write_log("Process %d finished with status %d", old_pid, status);
 
-                pids[i] = exec_command(subprocs[i]);
+                if (subprocs[i] != NULL) {
+                    write_log("Restarting process %d", old_pid);
+                    pids[i] = exec_command(subprocs[i]);
+                    write_log("Process %d restarted with pid %d", old_pid, pids[i]);
+                }
             }
         }
     }
