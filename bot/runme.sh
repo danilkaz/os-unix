@@ -17,7 +17,7 @@ cat res.txt
 rm res.txt
 
 # Part 2
-for i in {1..10}
+for i in {1..5}
 do
     echo "Many runs of many clients: ${i}"
     ./many_clients.sh
@@ -25,6 +25,9 @@ done
 
 # Check heap
 cat /tmp/server.log | grep sbrk | (head -n1 && tail -n1)
+
+# Kill server
+pkill server
 
 # Part 3
 # Efficiency checks

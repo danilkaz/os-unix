@@ -13,6 +13,8 @@ fi
 
 rm -f /tmp/server.log /tmp/client_*.log
 
+make run_server &
+
 # Run clients
 for i in $(seq 1 $cnt)
 do
@@ -48,3 +50,5 @@ echo "Efficiency check with $cnt clients, $sleep sleep time"
 echo "Server work time = $work_time s, max client sleep time = $max_client_sleep_time s"
 echo "Result = $(($work_time - $max_client_sleep_time))"
 echo "----------------------------------------------------------------------------------"
+
+pkill server
