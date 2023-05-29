@@ -1,0 +1,137 @@
+Checking state after 100 clients
+0
+
+Many runs of many clients: 1
+Many runs of many clients: 2
+Many runs of many clients: 3
+Many runs of many clients: 4
+Many runs of many clients: 5
+Many runs of many clients: 6
+Many runs of many clients: 7
+Many runs of many clients: 8
+Many runs of many clients: 9
+Many runs of many clients: 10
+
+11:27:17 Client 0 connected, fd = 5, sbrk = 0x7f29b000
+11:28:52 Client 1100 connected, fd = 104, sbrk = 0x7f29b000
+
+Efficiency check with 20 clients, 0 sleep time
+Server work time = 2 s, max client sleep time = 0 s
+Result = 2
+----------------------------------------------------------------------------------
+Efficiency check with 20 clients, 200 sleep time
+Server work time = 8 s, max client sleep time = 6 s
+Result = 2
+----------------------------------------------------------------------------------
+Efficiency check with 20 clients, 400 sleep time
+Server work time = 18 s, max client sleep time = 16 s
+Result = 2
+----------------------------------------------------------------------------------
+Efficiency check with 20 clients, 600 sleep time
+Server work time = 23 s, max client sleep time = 21 s
+Result = 2
+----------------------------------------------------------------------------------
+Efficiency check with 20 clients, 800 sleep time
+Server work time = 32 s, max client sleep time = 29 s
+Result = 3
+----------------------------------------------------------------------------------
+Efficiency check with 20 clients, 1000 sleep time
+Server work time = 38 s, max client sleep time = 37 s
+Result = 1
+----------------------------------------------------------------------------------
+Efficiency check with 40 clients, 0 sleep time
+Server work time = 2 s, max client sleep time = 0 s
+Result = 2
+----------------------------------------------------------------------------------
+Efficiency check with 40 clients, 200 sleep time
+Server work time = 10 s, max client sleep time = 8 s
+Result = 2
+----------------------------------------------------------------------------------
+Efficiency check with 40 clients, 400 sleep time
+Server work time = 17 s, max client sleep time = 15 s
+Result = 2
+----------------------------------------------------------------------------------
+Efficiency check with 40 clients, 600 sleep time
+Server work time = 22 s, max client sleep time = 19 s
+Result = 3
+----------------------------------------------------------------------------------
+Efficiency check with 40 clients, 800 sleep time
+Server work time = 35 s, max client sleep time = 35 s
+Result = 0
+----------------------------------------------------------------------------------
+Efficiency check with 40 clients, 1000 sleep time
+Server work time = 45 s, max client sleep time = 43 s
+Result = 2
+----------------------------------------------------------------------------------
+Efficiency check with 60 clients, 0 sleep time
+Server work time = 3 s, max client sleep time = 0 s
+Result = 3
+----------------------------------------------------------------------------------
+Efficiency check with 60 clients, 200 sleep time
+Server work time = 10 s, max client sleep time = 8 s
+Result = 2
+----------------------------------------------------------------------------------
+Efficiency check with 60 clients, 400 sleep time
+Server work time = 17 s, max client sleep time = 15 s
+Result = 2
+----------------------------------------------------------------------------------
+Efficiency check with 60 clients, 600 sleep time
+Server work time = 20 s, max client sleep time = 19 s
+Result = 1
+----------------------------------------------------------------------------------
+Efficiency check with 60 clients, 800 sleep time
+Server work time = 32 s, max client sleep time = 31 s
+Result = 1
+----------------------------------------------------------------------------------
+Efficiency check with 60 clients, 1000 sleep time
+Server work time = 42 s, max client sleep time = 40 s
+Result = 2
+----------------------------------------------------------------------------------
+Efficiency check with 80 clients, 0 sleep time
+Server work time = 2 s, max client sleep time = 0 s
+Result = 2
+----------------------------------------------------------------------------------
+Efficiency check with 80 clients, 200 sleep time
+Server work time = 8 s, max client sleep time = 6 s
+Result = 2
+----------------------------------------------------------------------------------
+Efficiency check with 80 clients, 400 sleep time
+Server work time = 15 s, max client sleep time = 14 s
+Result = 1
+----------------------------------------------------------------------------------
+Efficiency check with 80 clients, 600 sleep time
+Server work time = 21 s, max client sleep time = 19 s
+Result = 2
+----------------------------------------------------------------------------------
+Efficiency check with 80 clients, 800 sleep time
+Server work time = 32 s, max client sleep time = 29 s
+Result = 3
+----------------------------------------------------------------------------------
+Efficiency check with 80 clients, 1000 sleep time
+Server work time = 39 s, max client sleep time = 38 s
+Result = 1
+----------------------------------------------------------------------------------
+Efficiency check with 100 clients, 0 sleep time
+Server work time = 3 s, max client sleep time = 0 s
+Result = 3
+----------------------------------------------------------------------------------
+Efficiency check with 100 clients, 200 sleep time
+Server work time = 9 s, max client sleep time = 7 s
+Result = 2
+----------------------------------------------------------------------------------
+Efficiency check with 100 clients, 400 sleep time
+Server work time = 16 s, max client sleep time = 14 s
+Result = 2
+----------------------------------------------------------------------------------
+Efficiency check with 100 clients, 600 sleep time
+Server work time = 21 s, max client sleep time = 18 s
+Result = 3
+----------------------------------------------------------------------------------
+Efficiency check with 100 clients, 800 sleep time
+Server work time = 33 s, max client sleep time = 32 s
+Result = 1
+----------------------------------------------------------------------------------
+Efficiency check with 100 clients, 1000 sleep time
+Server work time = 35 s, max client sleep time = 33 s
+Result = 2
+----------------------------------------------------------------------------------
